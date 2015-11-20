@@ -1,0 +1,12 @@
+GEM
+  specs:
+    calyx (0.4.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  calyx
+
+BUNDLED WITH
+   1.10.6
