@@ -9,7 +9,8 @@ def available_directions(position)
 end
 
 def exit_directions(entrances=[])
-  CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(rand(1..(3-entrances.length)))
+  #CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(rand(1..(3-entrances.length)))
+  CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(1)
 end
 
 def move_position(position, direction)
@@ -42,7 +43,7 @@ end
 
 class Area
   def initialize
-    @size = rand(40..60)
+    @size = 10
     @start = [0,0]
     @chambers = {}
   end
@@ -54,13 +55,63 @@ class Area
 
   def add_chamber(position)
     return if @chambers.count >= @size
-    exits = exit_directions(available_directions(position))
+
+    exits = exit_directions(position)
+
     @chambers[position] = Chamber.new(position, exits)
+
     exits.each do |direction|
-      #add_chamber(move_position(position, direction))
+      add_chamber(move_position(position, direction))
     end
   end
 end
 
 area = Area.new
-p area.generate
+chambers = area.generate
+
+
+
+# p chambers
+#
+max_x, _ = chambers.keys.max_by { |(x, y)| x }
+_, max_y = chambers.keys.max_by { |(x, y)| y }
+min_x, _ = chambers.keys.min_by { |(x, y)| x }
+_, min_y = chambers.keys.min_by { |(x, y)| y }
+
+min_x.upto(max_x) do |x|
+  row = []
+  min_y.upto(max_y) do |y|
+    chamber = chambers[[x,y]]
+    if chamber.nil?
+      row << ' '
+    else
+      row << '#'
+    end
+  end
+  puts row.join
+end
+#
+# max_y = chambers.max_by do |entry|
+#   position, chamber = entry
+#   position.last
+# end
+#
+# min_x = chambers.min_by do |entry|
+#   position, chamber = entry
+#   position.first
+# end
+#
+# min_y = chambers.min_by do |entry|
+#   position, chamber = entry
+#   position.last
+# end
+#
+# p max_x
+# # puts max_y
+# # puts min_x
+# # puts min_y
+
+# area.generate.each do |entry|
+#   position, chamber = entry
+#   p position
+# end
