@@ -10,7 +10,7 @@ end
 
 def exit_directions(entrances=[])
   #CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(rand(1..(3-entrances.length)))
-  CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(1)
+  CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(rand(1..3))
 end
 
 def move_position(position, direction)
@@ -32,18 +32,18 @@ class Chamber
     @exits = exits
   end
 
-  def exit_directions
-    @exits.keys
+  def position
+    @position.to_s
   end
 
-  def exits
-    @exits.values
+  def exit_directions
+    @exits
   end
 end
 
 class Area
   def initialize
-    @size = 10
+    @size = 400
     @start = [0,0]
     @chambers = {}
   end
@@ -53,10 +53,18 @@ class Area
     @chambers
   end
 
+  def place_exits(position)
+    exit_directions = CARDINAL_DIRECTIONS.reject do |direction|
+      @chambers.key?(move_position(position, direction))
+    end
+
+    exit_directions.sample(rand(1..3))
+  end
+
   def add_chamber(position)
     return if @chambers.count >= @size
 
-    exits = exit_directions(position)
+    exits = place_exits(position)
 
     @chambers[position] = Chamber.new(position, exits)
 
@@ -69,49 +77,70 @@ end
 area = Area.new
 chambers = area.generate
 
-
-
-# p chambers
-#
 max_x, _ = chambers.keys.max_by { |(x, y)| x }
 _, max_y = chambers.keys.max_by { |(x, y)| y }
 min_x, _ = chambers.keys.min_by { |(x, y)| x }
 _, min_y = chambers.keys.min_by { |(x, y)| y }
+
+map = []
+wall = ' '.freeze
+room = '#'.freeze
+entrance = '@'.freeze
+end_tile = '%'.freeze
+found_start = false
+found_end = false
+
+if (max_x - min_x) > (max_y - min_y)
+  check_start = -> (x,y) { x == min_x }
+  check_end = -> (x,y) { x == max_x }
+else
+  check_start = -> (x,y) { y == min_y }
+  check_end = -> (x,y) { y == max_y }
+end
 
 min_x.upto(max_x) do |x|
   row = []
   min_y.upto(max_y) do |y|
     chamber = chambers[[x,y]]
     if chamber.nil?
-      row << ' '
+      row << wall
+    elsif !found_start && check_start.call(x,y)
+      row << entrance
+      found_start = true
+    elsif !found_end && check_end.call(x,y)
+      row << end_tile
+      found_end = true
     else
-      row << '#'
+      row << room
     end
   end
-  puts row.join
+  map << row
 end
-#
-# max_y = chambers.max_by do |entry|
-#   position, chamber = entry
-#   position.last
-# end
-#
-# min_x = chambers.min_by do |entry|
-#   position, chamber = entry
-#   position.first
-# end
-#
-# min_y = chambers.min_by do |entry|
-#   position, chamber = entry
-#   position.last
-# end
-#
-# p max_x
-# # puts max_y
-# # puts min_x
-# # puts min_y
 
-# area.generate.each do |entry|
-#   position, chamber = entry
-#   p position
-# end
+require 'rasem'
+
+File.open("map.svg", "w") do |f|
+  Rasem::SVGImage.new(800, 800, f) do |f|
+    map.each_with_index do |row, i|
+      row.each_with_index do |col, j|
+        if col == room
+          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'black')
+        elsif col == entrance
+          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'red')
+        elsif col == end_tile
+          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'blue')
+        end
+      end
+    end
+  end
+end
+
+File.open("map.html", "w") do |f|
+  f.puts '<body style="text-align:center">'
+  f.puts '<img src="map.svg">'
+  chambers.each do |(position, chamber)|
+    f.puts "<h3>A chamber at #{chamber.position}</h3>"
+    f.puts "<p>Exits #{chamber.exit_directions.join(',')}.</p>"
+  end
+  f.puts '</body>'
+end
