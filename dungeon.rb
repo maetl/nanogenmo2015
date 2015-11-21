@@ -80,10 +80,3 @@ class Dungeon < Calyx::Grammar
 
   rule :stone_interior, '{verb_hewn} {prep_from} {adj_surface} {noun_stone}'
 end
-
-room = Dungeon.new
-
-10.times do
-  puts room.generate
-  puts
-end

@@ -1,17 +1,6 @@
+require './dungeon'
 
 CARDINAL_DIRECTIONS = ['N','S','E','W'].freeze
-
-def available_directions(position)
-  out_of_bounds = []
-  out_of_bounds << 'N' if position.first == 0
-  out_of_bounds << 'W' if position.last == 0
-  CARDINAL_DIRECTIONS.reject { |d| !out_of_bounds.include?(d) }
-end
-
-def exit_directions(entrances=[])
-  #CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(rand(1..(3-entrances.length)))
-  CARDINAL_DIRECTIONS.reject { |d| entrances.include?(d) }.sample(rand(1..3))
-end
 
 def move_position(position, direction)
   case direction
@@ -26,6 +15,17 @@ def move_position(position, direction)
   end
 end
 
+def cardinal_text(direction)
+  case direction
+  when 'N' then 'north'
+  when 'E' then 'east'
+  when 'S' then 'south'
+  when 'W' then 'west'
+  end
+end
+
+DungeonGenerator = Dungeon.new
+
 class Chamber
   def initialize(position, exits)
     @position = position
@@ -36,14 +36,24 @@ class Chamber
     @position.to_s
   end
 
-  def exit_directions
-    @exits
+  def generate_text
+    DungeonGenerator.generate
+  end
+
+  def generate_exits
+    if @exits.empty?
+      ['There is no way forward', 'You have come to a dead end.'].sample
+    elsif @exits.count == 1
+      "There is a passage leading #{cardinal_text(@exits.first)}."
+    else
+      "There are passages to the #{@exits.map { |d| cardinal_text(d) }.join(' and ')}."
+    end
   end
 end
 
 class Area
-  def initialize
-    @size = 400
+  def initialize(size: 400)
+    @size = size
     @start = [0,0]
     @chambers = {}
   end
@@ -135,12 +145,16 @@ File.open("map.svg", "w") do |f|
   end
 end
 
+
+
 File.open("map.html", "w") do |f|
-  f.puts '<body style="text-align:center">'
+  f.puts '<meta charset="utf-8">'
+  f.puts '<body>'
   f.puts '<img src="map.svg">'
-  chambers.each do |(position, chamber)|
-    f.puts "<h3>A chamber at #{chamber.position}</h3>"
-    f.puts "<p>Exits #{chamber.exit_directions.join(',')}.</p>"
+  chambers.each_with_index do |(position, chamber), i|
+    f.puts "<h3>§ #{i+1}</h3>"
+    f.puts "<p>#{chamber.generate_text}</p>"
+    f.puts "<p>#{chamber.generate_exits}</p>"
   end
   f.puts '</body>'
 end
