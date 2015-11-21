@@ -24,21 +24,12 @@ class Dungeon < Calyx::Grammar
   rule :is_or_seems, 'is', 'seems', 'looks', 'feels'
 
   rule :empty_atmosphere, 'The {room_noun} {is_or_seems} {empty_adj}.', '{air_atmosphere}.', '{air_atmosphere}. It {is_or_seems} {empty_adj}.'
-
   rule :area_preposition, 'in', 'through', 'across', 'within', 'inside'
-
   rule :air_atmosphere, 'A {air_movement} of {air_condition} {air_description}'
-
-  rule :air_movement, :breath_verb, :rushing_verb
-  rule :breath_verb, 'breath', 'draft', 'current', 'flow'
-  rule :rushing_verb, 'jet', 'rush', 'blast', 'stream'
-
+  rule :air_movement, 'breath', 'draft', 'current', 'flow', 'rush', 'blast', 'stream'
   rule :air_temperature_adj, 'hot', 'cold', 'dry', 'warm', 'rancid', 'stale'
-
   rule :air_condition, '{air_temperature_adj} air'
-
   rule :air_description, '{fills_verb} the {room_noun}'
-
   rule :fills_verb, 'permeates', 'fills', 'expands {area_preposition}', 'spreads {area_preposition}'
 
 
