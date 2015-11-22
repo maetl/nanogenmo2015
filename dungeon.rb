@@ -49,11 +49,9 @@ class Dungeon < Calyx::Grammar
 
   rule :existential_quote, ''
 
-  rule :hero, ['Vladimir', 'Estragon'].sample
+  rule :entry_verb, 'enter', 'step into', 'come to', 'are in'
 
-  rule :entry_verb, 'enters', 'steps into'
-
-  rule :room_description, '{hero} {entry_verb} {room_article}.'
+  rule :room_description, 'You {entry_verb} {room_article}.'
 
   rule :room_article, 'a {shrine}', 'a {adj_atmosphere} {shrine}'
 

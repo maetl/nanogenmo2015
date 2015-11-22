@@ -1,4 +1,6 @@
 require './dungeon'
+require './quest'
+require './introduction'
 
 CARDINAL_DIRECTIONS = ['N','S','E','W'].freeze
 
@@ -138,19 +140,23 @@ File.open("map.svg", "w") do |f|
         elsif col == entrance
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'red')
         elsif col == end_tile
-          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'blue')
+          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'orange')
         end
       end
     end
   end
 end
 
-
+intro = Introduction.new
 
 File.open("map.html", "w") do |f|
   f.puts '<meta charset="utf-8">'
   f.puts '<body>'
   f.puts '<img src="map.svg">'
+
+  f.puts '<h3>Introduction</h3>'
+  f.puts "<p>#{intro.generate}</p>"
+
   chambers.each_with_index do |(position, chamber), i|
     f.puts "<h3>§ #{i+1}</h3>"
     f.puts "<p>#{chamber.generate_text}</p>"
