@@ -11,11 +11,13 @@ class Dungeon < Calyx::Grammar
   )
 
   rule :empty, '{room_description} {empty_atmosphere}'
-  rule :monster_only, '{room_description} There is a monster here.'
-  rule :monster_treasure, '{room_description} There is a monster and treasure here.'
+  rule :monster_only, '{room_description} There is a monster here. {monster_encounter}'
+  rule :monster_treasure, '{room_description} There is a monster and treasure here. {monster_encounter}'
   rule :special, '{room_description} {special_situation}'
   rule :trick_trap, '{room_description} There is something not quite right about this place.'
   rule :treasure, '{room_description} There is treasure here.'
+
+  rule :monster_encounter, ''
 
   #rule :precious_metal, 'gold', 'silver', 'bronze'
   #memo :treasure, '{precious_metal} coins', '{precious_metal} ingots'

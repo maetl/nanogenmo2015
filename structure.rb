@@ -1,3 +1,4 @@
+require './encounter'
 require './dungeon'
 require './quest'
 require './introduction'
