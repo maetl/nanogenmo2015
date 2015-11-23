@@ -19,7 +19,9 @@ class Introduction < Calyx::Grammar
   #rule :first_line, :local_legend_trope, :tavern_trope, :captive_trope
   rule :first_line, :local_legend_trope
   rule :local_legend_trope, 'It is said that {curse_fallen} {these_lands}. {stories_you_hear}', 'Throughout your journey in {these_lands}, {noticed_corruption}'
-  rule :curse_fallen, 'a curse has fallen upon', 'a curse has descended upon'
+  rule :curse_fallen, 'a {curse_noun} has {curse_verb} upon'
+  rule :curse_verb, 'fallen', 'descended', 'come'
+  rule :curse_noun, 'curse', 'bane', 'blight', 'plague'
   rule :these_lands, 'these lands', 'this land'
   rule :noticed_corruption, 'you’ve {heard_stories}'
   rule :stories_you_hear, 'The {stories_noun} {stories_subject} {stories_impact}', 'You’ve heard {stories_noun} {stories_subject} which {stories_impact}'
@@ -29,7 +31,11 @@ class Introduction < Calyx::Grammar
   rule :stories_subject, 'of a {stories_fear} {stories_energy}'
   rule :stories_fear, 'creeping', 'lurking', 'growing', 'chilling', 'teratoid'
   rule :stories_energy, 'horror', 'darkness', 'shadow'
-  rule :stories_impact, 'get more and more disturbing as you get closer to the village of {village_name}'
+  rule :stories_impact, '{seem_verb} {more_and_more} {disturbing} as you {travel_closer}'
+  rule :more_and_more, 'more and more', 'increasingly'
+  rule :seem_verb, 'are', 'seem', 'get', 'become'
+  rule :disturbing, 'disturbing', 'unhinged', 'alarming', 'threatening'
+  rule :travel_closer, 'get closer to the village of {village_name}'
   rule :village_name, VILLAGE_NAME
   rule :quest, QUEST
   rule :defeat_monster, '{monster_name} is a {monster_type} {impacts_of_monster}'
