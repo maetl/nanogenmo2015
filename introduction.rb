@@ -29,16 +29,16 @@ class Introduction < Calyx::Grammar
   rule :stories_adj, 'whispered', 'subtle'
   rule :stories_noun, 'rumours', 'legends', 'tales', 'stories'
   rule :stories_subject, 'of a {stories_fear} {stories_energy}'
-  rule :stories_fear, 'creeping', 'lurking', 'growing', 'chilling', 'teratoid'
-  rule :stories_energy, 'horror', 'darkness', 'shadow'
+  rule :stories_fear, 'creeping', 'lurking', 'spreading', 'chilling', 'teratoid'
+  rule :stories_energy, 'horror', 'darkness', 'shadow', 'scourge'
   rule :stories_impact, '{seem_verb} {more_and_more} {disturbing} as you {travel_closer}'
   rule :more_and_more, 'more and more', 'increasingly'
-  rule :seem_verb, 'are', 'seem', 'get', 'become'
+  rule :seem_verb, 'grow', 'seem', 'get', 'become'
   rule :disturbing, 'disturbing', 'unhinged', 'alarming', 'threatening'
   rule :travel_closer, 'get closer to the village of {village_name}'
   rule :village_name, VILLAGE_NAME
   rule :quest, QUEST
-  rule :defeat_monster, '{monster_name} is a {monster_type} {impacts_of_monster}'
+  rule :defeat_monster, 'The {stories_noun} tell of {monster_name}, a {monster_type} {impacts_of_monster}. The {people} {ask_for_help} {help} {this_menace} {before_toll}'
   rule :monster_name, MONSTER_NAME
   rule :monster_type, MONSTER_TYPE
   rule :dragon, '{dragon_impression_adj} {dragon_appearance_adj} dragon'
@@ -52,4 +52,9 @@ class Introduction < Calyx::Grammar
   rule :out, 'out', ''
   rule :impact_spread_conj, ' and {impact_corruption}', ''
   rule :impact_corruption, 'poisoning the countryside'
+  rule :people, 'people of {village_name}', 'villagers'
+  rule :ask_for_help, 'plead with you to', 'insist that you must', 'implore you to', 'beseech you to'
+  rule :help, 'help fight', 'destroy', 'obliterate'
+  rule :this_menace, 'this menace'
+  rule :before_toll, 'before the darkness takes its toll'
 end
