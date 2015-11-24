@@ -18,6 +18,15 @@ def move_position(position, direction)
   end
 end
 
+def flip_direction(direction)
+  case direction
+  when 'N' then 'S'
+  when 'S' then 'N'
+  when 'E' then 'W'
+  when 'W' then 'E'
+  end
+end
+
 def cardinal_text(direction)
   case direction
   when 'N' then 'north'
@@ -30,6 +39,8 @@ end
 DungeonGenerator = Dungeon.new
 
 class Chamber
+  attr_accessor :exits
+
   def initialize(position, exits)
     @position = position
     @exits = exits
@@ -55,7 +66,7 @@ class Chamber
 end
 
 class Area
-  def initialize(size: 400)
+  def initialize(size: 100)
     @size = size
     @start = [0,0]
     @chambers = {}
@@ -71,18 +82,24 @@ class Area
       @chambers.key?(move_position(position, direction))
     end
 
-    exit_directions.sample(rand(1..3))
+    exit_directions.sample(rand(0..3))
   end
 
-  def add_chamber(position)
-    return if @chambers.count >= @size
+  def add_chamber(position, from_direction=nil, previous=nil)
+    if @chambers.count < @size
+      exits = place_exits(position)
 
-    exits = place_exits(position)
+      unless from_direction.nil?
+        exits_with_entrance = exits | [flip_direction(from_direction)]
+      end
+    else
+      exits = []
+    end
 
-    @chambers[position] = Chamber.new(position, exits)
+    @chambers[position] = Chamber.new(position, exits_with_entrance || exits)
 
     exits.each do |direction|
-      add_chamber(move_position(position, direction))
+      add_chamber(move_position(position, direction), direction, @chambers[position])
     end
   end
 end
@@ -116,15 +133,17 @@ min_x.upto(max_x) do |x|
   min_y.upto(max_y) do |y|
     chamber = chambers[[x,y]]
     if chamber.nil?
-      row << wall
+      row << {tile: wall, chamber: chamber}
+    elsif chamber.position == '[0,0]'
+      row << {tile: entrance, chamber: chamber}
     elsif !found_start && check_start.call(x,y)
-      row << entrance
+      row << {tile: entrance, chamber: chamber}
       found_start = true
     elsif !found_end && check_end.call(x,y)
-      row << end_tile
+      row << {tile: end_tile, chamber: chamber}
       found_end = true
     else
-      row << room
+      row << {tile: room, chamber: chamber}
     end
   end
   map << row
@@ -136,12 +155,27 @@ File.open("map.svg", "w") do |f|
   Rasem::SVGImage.new(800, 800, f) do |f|
     map.each_with_index do |row, i|
       row.each_with_index do |col, j|
-        if col == room
-          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'black')
-        elsif col == entrance
-          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'red')
-        elsif col == end_tile
+        if col[:tile] == room
+          exits = col[:chamber].exits
+          #rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'green')
+          line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
+          line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
+          line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
+          line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
+        elsif col[:tile] == entrance
+          exits = col[:chamber].exits
+          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'cyan')
+          line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
+          line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
+          line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
+          line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
+        elsif col[:tile] == end_tile
+          exits = col[:chamber].exits
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'orange')
+          line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
+          line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
+          line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
+          line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
         end
       end
     end
