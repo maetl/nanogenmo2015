@@ -1,7 +1,7 @@
 require './encounter'
-require './dungeon'
 require './quest'
 require './introduction'
+require './chamber'
 
 CARDINAL_DIRECTIONS = ['N','S','E','W'].freeze
 
@@ -36,79 +36,51 @@ def cardinal_text(direction)
   end
 end
 
-DungeonGenerator = Dungeon.new
+class Cell
+  attr_reader :position, :next_cells
 
-class Chamber
-  attr_accessor :exits
-
-  def initialize(position, exits, previous)
+  def initialize(position, next_cells)
     @position = position
-    @exits = exits
-    @previous = previous
-  end
-
-  def position
-    @position.to_s
-  end
-
-  def generate_text
-    DungeonGenerator.generate
-  end
-
-  def generate_exits
-    if @exits.empty?
-      ['There is no way forward', 'You have come to a dead end.'].sample
-    elsif @exits.count == 1
-      "There is a passage leading #{cardinal_text(@exits.first)}."
-    else
-      "There are passages to the #{@exits.map { |d| cardinal_text(d) }.join(' and ')}."
-    end
+    @next_cells = next_cells
   end
 end
 
 class Area
   def initialize(size: 500)
     @size = size
-    @start = [0,0]
-    @chambers = {}
+    @cells = {}
   end
 
   def generate
-    add_chamber(@start)
-    @chambers
+    add_cell([0,0])
+    @cells
   end
 
-  def place_exits(position, from_direction)
-    exit_directions = CARDINAL_DIRECTIONS.reject do |direction|
-      direction == from_direction
-    end.reject do |direction|
-      @chambers.key?(move_position(position, direction))
+  def move_next(position)
+    next_cells = CARDINAL_DIRECTIONS.reject do |direction|
+      @cells.key?(move_position(position, direction))
     end
 
-    exit_directions.sample(rand(1..3))
+    next_cells.sample(rand(1..3))
   end
 
-  def add_chamber(position, from_direction=nil, previous=nil)
-    if @chambers.count < @size
-      exits = place_exits(position, from_direction)
-    else
-      exits = []
-    end
+  def add_cell(position)
+    return if @cells.count >= @size
 
-    @chambers[position] = unless from_direction.nil?
-      Chamber.new(position, exits | [flip_direction(from_direction)], previous)
-    else
-      Chamber.new(position, exits, previous)
-    end
+    next_cells = move_next(position)
 
-    exits.each do |direction|
-      add_chamber(move_position(position, direction), direction, @chambers[position])
+    @cells[position] = Cell.new(position, next_cells)
+
+    next_cells.each do |direction|
+      add_cell(move_position(position, direction))
     end
   end
 end
 
 area = Area.new
 chambers = area.generate
+
+p chambers
 
 max_x, _ = chambers.keys.max_by { |(x, y)| x }
 _, max_y = chambers.keys.max_by { |(x, y)| y }
@@ -159,46 +131,46 @@ File.open("map.svg", "w") do |f|
     map.each_with_index do |row, i|
       row.each_with_index do |col, j|
         if col[:tile] == room
-          exits = col[:chamber].exits
-          #rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'green')
-          line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
-          line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
-          line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
-          line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
+          exits = col[:chamber].next_cells
+          rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'green')
+          # line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
+          # line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
+          # line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
+          # line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
         elsif col[:tile] == entrance
-          exits = col[:chamber].exits
+          exits = col[:chamber].next_cells
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'cyan')
-          line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
-          line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
-          line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
-          line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
+          # line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
+          # line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
+          # line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
+          # line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
         elsif col[:tile] == end_tile
-          exits = col[:chamber].exits
+          exits = col[:chamber].next_cells
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'orange')
-          line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
-          line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
-          line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
-          line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
+          # line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
+          # line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
+          # line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
+          # line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
         end
       end
     end
   end
 end
 
-intro = Introduction.new
-
-File.open("map.html", "w") do |f|
-  f.puts '<meta charset="utf-8">'
-  f.puts '<body>'
-  f.puts '<img src="map.svg">'
-
-  f.puts '<h3>Introduction</h3>'
-  f.puts "<p>#{intro.generate}</p>"
-
-  chambers.each_with_index do |(position, chamber), i|
-    f.puts "<h3>§ #{i+1}</h3>"
-    f.puts "<p>#{chamber.generate_text}</p>"
-    f.puts "<p>#{chamber.generate_exits}</p>"
-  end
-  f.puts '</body>'
-end
+# intro = Introduction.new
+#
+# File.open("map.html", "w") do |f|
+#   f.puts '<meta charset="utf-8">'
+#   f.puts '<body>'
+#   f.puts '<img src="map.svg">'
+#
+#   f.puts '<h3>Introduction</h3>'
+#   f.puts "<p>#{intro.generate}</p>"
+#
+#   chambers.each_with_index do |(position, chamber), i|
+#     f.puts "<h3>§ #{i+1}</h3>"
+#     f.puts "<p>#{chamber.generate_text}</p>"
+#     f.puts "<p>#{chamber.generate_exits}</p>"
+#   end
+#   f.puts '</body>'
+# end
