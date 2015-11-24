@@ -41,9 +41,10 @@ DungeonGenerator = Dungeon.new
 class Chamber
   attr_accessor :exits
 
-  def initialize(position, exits)
+  def initialize(position, exits, previous)
     @position = position
     @exits = exits
+    @previous = previous
   end
 
   def position
@@ -66,7 +67,7 @@ class Chamber
 end
 
 class Area
-  def initialize(size: 100)
+  def initialize(size: 500)
     @size = size
     @start = [0,0]
     @chambers = {}
@@ -77,26 +78,28 @@ class Area
     @chambers
   end
 
-  def place_exits(position)
+  def place_exits(position, from_direction)
     exit_directions = CARDINAL_DIRECTIONS.reject do |direction|
+      direction == from_direction
+    end.reject do |direction|
       @chambers.key?(move_position(position, direction))
     end
 
-    exit_directions.sample(rand(0..3))
+    exit_directions.sample(rand(1..3))
   end
 
   def add_chamber(position, from_direction=nil, previous=nil)
     if @chambers.count < @size
-      exits = place_exits(position)
-
-      unless from_direction.nil?
-        exits_with_entrance = exits | [flip_direction(from_direction)]
-      end
+      exits = place_exits(position, from_direction)
     else
       exits = []
     end
 
-    @chambers[position] = Chamber.new(position, exits_with_entrance || exits)
+    @chambers[position] = unless from_direction.nil?
+      Chamber.new(position, exits | [flip_direction(from_direction)], previous)
+    else
+      Chamber.new(position, exits, previous)
+    end
 
     exits.each do |direction|
       add_chamber(move_position(position, direction), direction, @chambers[position])
