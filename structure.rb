@@ -51,9 +51,57 @@ class Area
     @cells = {}
   end
 
-  def generate
-    add_cell([0,0])
+  def get_placeholder_cells
     @cells
+  end
+
+  def generate
+    scatter_cells
+    calculate_origin
+  end
+
+  def each_from_origin
+    0.upto(@width) do |x|
+      buffer = ''
+      0.upto(@height) do |y|
+        # p [x,y]
+        # p [x-min_x,y-min_y]
+        # puts '------------'
+        if @cells.key?([x + min_x, y + min_y])
+          # cell object
+          buffer << '#'
+        else
+          # mask object
+          buffer << ' '
+        end
+      end
+      puts buffer
+    end
+  end
+
+  def scatter_cells
+    add_cell([0,0])
+  end
+
+  def calculate_origin
+    @width = max_x - min_x
+    @height = max_y - min_y
+  end
+
+  def max_x
+    @max_x ||= @cells.keys.max_by { |(x, y)| x }.first
+  end
+
+  def max_y
+    @max_y ||= @cells.keys.max_by { |(x, y)| y }.last
+  end
+
+  def min_x
+    @min_x ||= @cells.keys.min_by { |(x, y)| x }.first
+  end
+
+  def min_y
+    @min_y ||= @cells.keys.min_by { |(x, y)| y }.last
   end
 
   def move_next(position)
@@ -78,14 +126,11 @@ class Area
 end
 
 area = Area.new
-chambers = area.generate
+area.generate
 
-p chambers
+area.each_from_origin
 
-max_x, _ = chambers.keys.max_by { |(x, y)| x }
-_, max_y = chambers.keys.max_by { |(x, y)| y }
-min_x, _ = chambers.keys.min_by { |(x, y)| x }
-_, min_y = chambers.keys.min_by { |(x, y)| y }
+chambers = area.get_placeholder_cells
 
 map = []
 wall = ' '.freeze
@@ -94,6 +139,11 @@ entrance = '@'.freeze
 end_tile = '%'.freeze
 found_start = false
 found_end = false
+
+min_x = area.min_x
+min_y = area.min_y
+max_x = area.max_x
+max_y = area.max_y
 
 if (max_x - min_x) > (max_y - min_y)
   check_start = -> (x,y) { x == min_x }
