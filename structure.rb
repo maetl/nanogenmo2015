@@ -36,27 +36,27 @@ def cardinal_text(direction)
   end
 end
 
-class Cell
-  attr_reader :position, :next_cells
+class Space
+  attr_reader :position, :next_spaces
 
-  def initialize(position, next_cells)
+  def initialize(position, next_spaces)
     @position = position
-    @next_cells = next_cells
+    @next_spaces = next_spaces
   end
 end
 
 class Area
-  def initialize(size: 500)
+  def initialize(size=500)
     @size = size
-    @cells = {}
+    @spaces = {}
   end
 
   def get_placeholder_cells
-    @cells
+    @spaces
   end
 
   def generate
-    scatter_cells
+    scatter_spaces
     calculate_origin
   end
 
@@ -67,7 +67,7 @@ class Area
         # p [x,y]
         # p [x-min_x,y-min_y]
         # puts '------------'
-        if @cells.key?([x + min_x, y + min_y])
+        if @spaces.key?([x + min_x, y + min_y])
           # cell object
           buffer << '#'
         else
@@ -79,8 +79,8 @@ class Area
     end
   end
 
-  def scatter_cells
-    add_cell([0,0])
+  def scatter_spaces
+    add_space([0,0])
   end
 
   def calculate_origin
@@ -89,38 +89,38 @@ class Area
   end
 
   def max_x
-    @max_x ||= @cells.keys.max_by { |(x, y)| x }.first
+    @max_x ||= @spaces.keys.max_by { |(x, y)| x }.first
   end
 
   def max_y
-    @max_y ||= @cells.keys.max_by { |(x, y)| y }.last
+    @max_y ||= @spaces.keys.max_by { |(x, y)| y }.last
   end
 
   def min_x
-    @min_x ||= @cells.keys.min_by { |(x, y)| x }.first
+    @min_x ||= @spaces.keys.min_by { |(x, y)| x }.first
   end
 
   def min_y
-    @min_y ||= @cells.keys.min_by { |(x, y)| y }.last
+    @min_y ||= @spaces.keys.min_by { |(x, y)| y }.last
   end
 
   def move_next(position)
-    next_cells = CARDINAL_DIRECTIONS.reject do |direction|
-      @cells.key?(move_position(position, direction))
+    next_spaces = CARDINAL_DIRECTIONS.reject do |direction|
+      @spaces.key?(move_position(position, direction))
     end
 
-    next_cells.sample(rand(1..3))
+    next_spaces.sample(rand(1..3))
   end
 
-  def add_cell(position)
-    return if @cells.count >= @size
+  def add_space(position)
+    return if @spaces.count >= @size
 
-    next_cells = move_next(position)
+    next_spaces = move_next(position)
 
-    @cells[position] = Cell.new(position, next_cells)
+    @spaces[position] = Space.new(position, next_spaces)
 
-    next_cells.each do |direction|
-      add_cell(move_position(position, direction))
+    next_spaces.each do |direction|
+      add_space(move_position(position, direction))
     end
   end
 end
@@ -181,21 +181,21 @@ File.open("map.svg", "w") do |f|
     map.each_with_index do |row, i|
       row.each_with_index do |col, j|
         if col[:tile] == room
-          exits = col[:chamber].next_cells
+          exits = col[:chamber].next_spaces
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'green')
           # line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
           # line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
           # line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
           # line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
         elsif col[:tile] == entrance
-          exits = col[:chamber].next_cells
+          exits = col[:chamber].next_spaces
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'cyan')
           # line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
           # line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
           # line(i*10+10, j*10, i*10+10, j*10+10) unless exits.include?('E')
           # line(i*10, j*10+10, i*10+10, j*10+10) unless exits.include?('S')
         elsif col[:tile] == end_tile
-          exits = col[:chamber].next_cells
+          exits = col[:chamber].next_spaces
           rectangle(i*10, j*10, 10, 10, :stroke_width=>1, :fill=> 'orange')
           # line(i*10, j*10, i*10+10, j*10) unless exits.include?('N')
           # line(i*10, j*10, i*10, j*10+10) unless exits.include?('W')
