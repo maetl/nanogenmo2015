@@ -2,6 +2,7 @@ require './encounter'
 require './quest'
 require './introduction'
 require './chamber'
+require './labyrinth'
 
 CARDINAL_DIRECTIONS = ['N','S','E','W'].freeze
 
@@ -57,35 +58,32 @@ class Area
 
   def generate
     scatter_spaces
-    calculate_origin
+    translate_to_origin
+    self
   end
 
-  def each_from_origin
-    0.upto(@width) do |x|
-      buffer = ''
-      0.upto(@height) do |y|
-        # p [x,y]
-        # p [x-min_x,y-min_y]
-        # puts '------------'
+  def to_labyrinth
+    Labyrinth.new(@width, @height, @bits)
+  end
+
+  def translate_to_origin
+    @width = max_x - min_x
+    @height = max_y - min_y
+    @bits = Array.new(@width) { Array.new(@height, false) }
+
+    0.upto(@width-1) do |x|
+      0.upto(@height-1) do |y|
         if @spaces.key?([x + min_x, y + min_y])
-          # cell object
-          buffer << '#'
+          @bits[x][y] = true
         else
-          # mask object
-          buffer << ' '
+          @bits[x][y] = false
         end
       end
-      puts buffer
     end
   end
 
   def scatter_spaces
     add_space([0,0])
-  end
-
-  def calculate_origin
-    @width = max_x - min_x
-    @height = max_y - min_y
   end
 
   def max_x
@@ -128,7 +126,15 @@ end
 area = Area.new
 area.generate
 
-area.each_from_origin
+labyrinth = area.to_labyrinth
+
+RecursiveBacktracker.on(labyrinth)
+
+labyrinth.each_cell do |cell|
+  p cell
+end
+
+exit
 
 chambers = area.get_placeholder_cells
 
