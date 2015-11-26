@@ -43,7 +43,7 @@ class Chamber
   end
 
   def position
-    @position.to_s
+    [@row, @column]
   end
 
   def generate_text

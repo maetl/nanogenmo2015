@@ -1,5 +1,5 @@
 class RecursiveBacktracker
-  def self.on(grid, start_at: grid.random_chamber)
+  def self.on(grid, start_at)
     stack = []
     stack.push start_at
 
@@ -22,12 +22,21 @@ end
 class Labyrinth
   attr_reader :rows, :columns
 
-  def initialize(rows, columns, grid)
+  def initialize(grid)
+    p grid
     @rows = grid.count
     @columns = grid.first.count
-    @grid = grid
+    @grid = grid.
 
     configure_cells
+  end
+
+  def prepare_grid
+    Array.new(rows) do |row|
+      Array.new(columns) do |column|
+        Cell.new(row, column)
+      end
+    end
   end
 
   def size
@@ -42,7 +51,9 @@ class Labyrinth
 
   def configure_cells
     each_cell do |cell|
-      row, col = cell.row, cell.column
+      row = cell.row
+      col = cell.column
+
       cell.north = self[row - 1, col]
       cell.south = self[row + 1, col]
       cell.west  = self[row, col - 1]
@@ -65,6 +76,7 @@ class Labyrinth
   def each_cell
     each_row do |row, x|
       row.each_with_index do |space, y|
+        #p space
         yield Chamber.new(x, y) if space
       end
     end

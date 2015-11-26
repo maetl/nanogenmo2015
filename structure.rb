@@ -47,6 +47,8 @@ class Space
 end
 
 class Area
+  attr_reader :grid
+
   def initialize(size=500)
     @size = size
     @spaces = {}
@@ -59,24 +61,65 @@ class Area
   def generate
     scatter_spaces
     translate_to_origin
+    connect_grid
+    #link_pathways
     self
   end
 
   def to_labyrinth
-    Labyrinth.new(@width, @height, @bits)
+    Labyrinth.new(@grid)
+  end
+
+  def connect_grid
+    @grid.each do |row|
+      row.each do |cell|
+        if cell
+          cell.north = grid_pointer(cell.position, 'N')
+          cell.south = grid_pointer(cell.position, 'S')
+          cell.west  = grid_pointer(cell.position, 'W')
+          cell.east  = grid_pointer(cell.position, 'E')
+        end
+      end
+    end
+  end
+
+  def grid_pointer(position, direction)
+    x, y = move_position(position, direction)
+    @grid[x][y] unless @grid[x].nil?
+  end
+
+  def link_pathways
+    stack = []
+    stack.push start_at
+
+    while stack.any?
+      current = stack.last
+      neighbors = current.neighbors.select { |n| n.links.empty? }
+      if neighbors.empty?
+        stack.pop
+      else
+        neighbor = neighbors.sample
+        current.link(neighbor)
+        stack.push(neighbor)
+      end
+    end
+
+    grid
   end
 
   def translate_to_origin
-    @width = max_x - min_x
-    @height = max_y - min_y
-    @bits = Array.new(@width) { Array.new(@height, false) }
+    width = max_x - min_x
+    height = max_y - min_y
+    origin = 0
 
-    0.upto(@width-1) do |x|
-      0.upto(@height-1) do |y|
+    @grid = Array.new(width) { Array.new(height, false) }
+
+    origin.upto(width-1) do |x|
+      origin.upto(height-1) do |y|
         if @spaces.key?([x + min_x, y + min_y])
-          @bits[x][y] = true
+          @grid[x][y] = Chamber.new(x, y)
         else
-          @bits[x][y] = false
+          # @grid[x][y] = false
         end
       end
     end
@@ -84,6 +127,10 @@ class Area
 
   def scatter_spaces
     add_space([0,0])
+  end
+
+  def start_space
+    @spaces.keys.max_by { |(x, y)| x }
   end
 
   def max_x
@@ -121,18 +168,30 @@ class Area
       add_space(move_position(position, direction))
     end
   end
+
+  def dump
+    @grid.each do |row|
+      buffer = String.new
+      row.each do |cell|
+        if cell
+          buffer << '#'
+        else
+          buffer << ' '
+        end
+      end
+      puts buffer
+    end
+  end
 end
 
 area = Area.new
 area.generate
-
-labyrinth = area.to_labyrinth
-
-RecursiveBacktracker.on(labyrinth)
-
-labyrinth.each_cell do |cell|
-  p cell
-end
+area.dump
+# p labyrinth[x, y]
+#
+# RecursiveBacktracker.on(labyrinth, labyrinth[x, y]).each_cell do |cell|
+#   #p cell
+# end
 
 exit
 
