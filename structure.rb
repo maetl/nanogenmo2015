@@ -62,7 +62,7 @@ class Area
     scatter_spaces
     translate_to_origin
     connect_grid
-    #link_pathways
+    link_pathways
     self
   end
 
@@ -90,7 +90,7 @@ class Area
 
   def link_pathways
     stack = []
-    stack.push start_at
+    stack.push(start_chamber)
 
     while stack.any?
       current = stack.last
@@ -103,8 +103,6 @@ class Area
         stack.push(neighbor)
       end
     end
-
-    grid
   end
 
   def translate_to_origin
@@ -129,8 +127,9 @@ class Area
     add_space([0,0])
   end
 
-  def start_space
-    @spaces.keys.max_by { |(x, y)| x }
+  def start_chamber
+    x,y = @spaces.keys.max_by { |(x, y)| x }
+    @grid[x][y]
   end
 
   def max_x
@@ -169,7 +168,17 @@ class Area
     end
   end
 
-  def dump
+  def dump_descriptions
+    @grid.each do |row|
+      row.each do |cell|
+        if cell
+          puts cell.generate_exits
+        end
+      end
+    end
+  end
+
+  def dump_map
     @grid.each do |row|
       buffer = String.new
       row.each do |cell|
@@ -186,7 +195,8 @@ end
 
 area = Area.new
 area.generate
-area.dump
+area.dump_descriptions
+
 # p labyrinth[x, y]
 #
 # RecursiveBacktracker.on(labyrinth, labyrinth[x, y]).each_cell do |cell|

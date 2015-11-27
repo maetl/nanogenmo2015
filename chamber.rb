@@ -42,6 +42,15 @@ class Chamber
     list
   end
 
+  def neighbours_directions
+    list = []
+    list << 'N' if north
+    list << 'S' if south
+    list << 'E' if east
+    list << 'W' if west
+    list
+  end
+
   def position
     [@row, @column]
   end
@@ -51,12 +60,12 @@ class Chamber
   end
 
   def generate_exits
-    if @exits.empty?
+    if neighbours_directions.empty?
       ['There is no way forward', 'You have come to a dead end.'].sample
-    elsif @exits.count == 1
-      "There is a passage leading #{cardinal_text(@exits.first)}."
+    elsif neighbours_directions.size == 1
+      "There is a passage leading #{cardinal_text(neighbours_directions.first)}."
     else
-      "There are passages to the #{@exits.map { |d| cardinal_text(d) }.join(' and ')}."
+      "There are passages to the #{neighbours_directions.map { |d| cardinal_text(d) }.join(' and ')}."
     end
   end
 end
