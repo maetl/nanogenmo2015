@@ -18,7 +18,31 @@ class Dungeon < Calyx::Grammar
   rule :trick_trap, '{room_description} There is something not quite right about this place.'
   rule :treasure, '{room_description} There is treasure here.'
 
-  rule :monster_encounter, ''
+  rule :monster_encounter, [:monster_deadly, 0.05], [:monster_hostile, 0.45], [:monster_neutral, 0.5]
+
+  rule :monster_deadly, :monster_basilisk
+  rule :monster_hostile, ''
+  rule :monster_neutral, ''
+
+  rule :monster_bulky, '{bulky_movement.capitalize} {room_movement} is'
+  rule :room_movement, 'towards you', 'ahead of you'
+  rule :bulky_movement, 'moving', 'lumbering', 'moving sluggishly', 'stamping', 'stoming', 'trampling'
+
+  rule :monster_basilisk, '{monster_bulky} a giant basilisk. As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death}'
+
+  rule :petrifying_gaze_strike, 'its petrifying gaze meets you head on', 'you stare straight into its petrifying gaze'
+  rule :petrifying_gaze_death, '{last_memory_flash} is the {horrific} expression in its eyes, as your body rapidly fuses into solid stone. THE END.'
+
+  rule :last_memory_flash, 'The last thing you remember', 'Your dying memory', 'Your final memory', ''
+
+  rule :reptilian_adj, 'scaly', 'dull coloured', 'scabrous', 'encrusted'
+  rule :reptilian_noun, 'monster', 'reptile', 'lizard'
+
+  rule :freeze_reaction, '{pause} with {shock}'
+  rule :head_movement, 'turns', 'raises', 'lifts'
+  rule :shock, 'shock', 'fright', 'fear'
+  rule :pause, 'freeze', 'pause', 'step back', 'stand frozen'
+  rule :horrific, 'horrifying', 'terrifying', 'abyssal'
 
   #rule :precious_metal, 'gold', 'silver', 'bronze'
   #memo :treasure, '{precious_metal} coins', '{precious_metal} ingots'

@@ -18,6 +18,7 @@ class Introduction < Calyx::Grammar
   rule :entrance, Entrance.new.generate
   #rule :first_line, :local_legend_trope, :tavern_trope, :captive_trope
   rule :first_line, :local_legend_trope
+
   rule :local_legend_trope, 'It is said that {curse_fallen} {these_lands}. {stories_you_hear}', 'Throughout your journey in {these_lands}, {noticed_corruption}'
   rule :curse_fallen, 'a {curse_noun} has {curse_verb} upon'
   rule :curse_verb, 'fallen', 'descended', 'come'

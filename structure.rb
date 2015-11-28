@@ -49,7 +49,7 @@ end
 class Area
   attr_reader :grid
 
-  def initialize(size=500)
+  def initialize(size=700)
     @size = size
     @spaces = {}
   end
@@ -201,6 +201,7 @@ end
 area = Area.new
 area.generate
 area.dump_descriptions
+#area.dump_map
 
 # p labyrinth[x, y]
 #
