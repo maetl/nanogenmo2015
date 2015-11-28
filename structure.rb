@@ -169,10 +169,15 @@ class Area
   end
 
   def dump_descriptions
-    @grid.each do |row|
-      row.each do |cell|
+    section = 0
+    @grid.each_with_index do |row, x|
+      row.each_with_index do |cell, y|
         if cell
+          section += 1
+          puts "§ #{section}"
+          puts cell.generate_text
           puts cell.generate_exits
+          puts
         end
       end
     end

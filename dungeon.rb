@@ -1,4 +1,5 @@
 require 'calyx'
+require 'indefinite_article'
 
 class Dungeon < Calyx::Grammar
   start(
@@ -55,11 +56,27 @@ class Dungeon < Calyx::Grammar
 
   rule :room_description, 'You {entry_verb} {room_article}.'
 
-  rule :room_article, 'a {shrine}', 'a {adj_atmosphere} {shrine}'
+  rule :room_article, '{room_type.with_indefinite_article}', '{adj_description.with_indefinite_article} {room_type}'
 
   rule :adj_atmosphere, 'gloomy', 'glowing', 'gleaming', 'wet', 'slimy', 'moss-covered', 'foul-smelling', 'foetid', 'clean', 'warm', 'chilly'
+  rule :adj_description, 'abandoned', 'ruined', 'wrecked', 'decaying', 'wreckage-strewn', 'crumbling', 'run-down'
+
+  rule :room_type, :assembly_room, :incaceration_room, :military_room, :religious_room, :industry_room, :scholarly_room, :farming_room, :domestic_room, :decadent_room
+
+  rule :assembly_room, 'gallery', 'great hall', 'hall', 'antechamber', 'assembly hall', 'arena'
+  rule :incaceration_room, 'prison', 'cage'
+  rule :military_room, 'guardroom', 'barracks', 'armory', 'combat pit'
+  rule :religious_room, :shrine
+  rule :industry_room, 'forge', 'workshop', 'tannery'
+  rule :scholarly_room, 'library', 'study', 'scriptorium', 'laboratory', 'map room'
+  rule :farming_room, 'barn', 'stable', 'pen'
+  rule :domestic_room, 'storage', 'wardrobe', 'pantry', 'bedroom', 'closet', 'kitchen'
+  rule :decadent_room, 'statuary', 'museum', 'treasury'
+
+  #rule :
 
   rule :shrine, 'shrine', 'shrine {shrine_decoration}'
+
   rule :shrine_decoration, :stone_interior
   #rule :shrine_contents, 'altar, arch, drapery, gilt, inlay, relief, dias, dome, font, fresco, mosaic, painting, pews, podium, idol, magic, candelabra, lamp, torches, pedestal, pillar, column, tapestry, offertory container, reliquary, offertory dish, oil, perfume, alcove, glass window, incense burner, alcohol, holy symbols, remains'.split(", ")
   rule :shrine_contents, 'altar', 'arch', 'drapery', 'gilt', 'inlay'

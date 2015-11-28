@@ -1,12 +1,27 @@
 GEM
   specs:
-    calyx (0.4.1)
+    activesupport (4.2.5)
+      i18n (~> 0.7)
+      json (~> 1.7, >= 1.7.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.3, >= 0.3.4)
+      tzinfo (~> 1.1)
+    calyx (0.5.1)
+    i18n (0.7.0)
+    indefinite_article (0.2.4)
+      activesupport
+    json (1.8.3)
+    minitest (5.8.3)
+    thread_safe (0.3.5)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   calyx
+  indefinite_article
 
 BUNDLED WITH
    1.10.6
