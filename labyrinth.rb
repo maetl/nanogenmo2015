@@ -6,15 +6,12 @@ class Labyrinth
     @spaces = {}
   end
 
-  def get_placeholder_cells
-    @spaces
-  end
-
   def generate
     scatter_spaces
     translate_to_origin
     connect_grid
     link_pathways
+    number_sections
     self
   end
 
@@ -71,6 +68,12 @@ class Labyrinth
     end
   end
 
+  def number_sections
+    chambers.each_with_index do |chamber, i|
+      chamber.section_number(i + 1)
+    end
+  end
+
   def scatter_spaces
     add_space([0,0])
   end
@@ -116,19 +119,8 @@ class Labyrinth
     end
   end
 
-  def dump_descriptions
-    section = 0
-    @grid.each_with_index do |row, x|
-      row.each_with_index do |cell, y|
-        if cell
-          section += 1
-          puts "§ #{section}"
-          puts cell.generate_text
-          puts cell.generate_exits
-          puts
-        end
-      end
-    end
+  def chambers
+    @grid.flatten.select { |chamber| chamber.is_a?(Chamber) }.shuffle
   end
 
   def dump_map

@@ -1,4 +1,5 @@
 require './dungeon'
+require 'active_support/core_ext/array'
 
 DungeonGenerator = Dungeon.new
 
@@ -33,6 +34,27 @@ class Chamber
     @links.key?(cell)
   end
 
+  def section_number(number)
+    @section_number = number
+  end
+
+  def section
+    @section_number
+  end
+
+  def section_heading
+    "§ #{@section_number}"
+  end
+
+  def neighbors_map
+    hash = {}
+    hash['N'] = north if north
+    hash['S'] = south if south
+    hash['E'] = east if east
+    hash['W'] = west if west
+    hash
+  end
+
   def neighbors
     list = []
     list << north if north
@@ -51,21 +73,33 @@ class Chamber
     list
   end
 
+  def neighbours_text_list
+    neighbours_directions.map { |d| Directions.cardinal_text(d).upcase }
+  end
+
+  def neighbours_text
+    neighbours_text_list.to_sentence
+  end
+
   def position
     [@row, @column]
   end
 
-  def generate_text
+  def section_body
     DungeonGenerator.generate
   end
 
   def generate_exits
-    if neighbours_directions.empty?
-      ['There is no way forward', 'You have come to a dead end.'].sample
-    elsif neighbours_directions.size == 1
-      "There is a passage leading #{Directions.cardinal_text(neighbours_directions.first)}."
+    if neighbours_directions.size == 1
+      "There is a passage leading #{neighbours_text}."
     else
-      "There are passages to the #{neighbours_directions.map { |d| Directions.cardinal_text(d) }.join(' and ')}."
+      "There are passages to the #{neighbours_text}."
     end
+  end
+
+  def exit_directions
+    neighbors_map.inject([]) do |dirs, (key, chamber)|
+      dirs << "- To go #{Directions.cardinal_text(key).upcase} turn to #{chamber.section_heading}"
+    end.join("\n")
   end
 end
