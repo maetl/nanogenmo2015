@@ -1,9 +1,10 @@
 class Labyrinth
-  attr_reader :grid
+  attr_reader :grid, :chambers
 
   def initialize(size=700)
     @size = size
     @spaces = {}
+    @chambers = []
   end
 
   def generate
@@ -11,6 +12,7 @@ class Labyrinth
     translate_to_origin
     connect_grid
     link_pathways
+    flatten_and_shuffle
     number_sections
     self
   end
@@ -68,6 +70,10 @@ class Labyrinth
     end
   end
 
+  def flatten_and_shuffle
+    @chambers = @grid.flatten.select { |chamber| chamber.is_a?(Chamber) }.shuffle
+  end
+
   def number_sections
     chambers.each_with_index do |chamber, i|
       chamber.section_number(i + 1)
@@ -117,10 +123,6 @@ class Labyrinth
     next_spaces.each do |direction|
       add_space(Directions.move(position, direction))
     end
-  end
-
-  def chambers
-    @grid.flatten.select { |chamber| chamber.is_a?(Chamber) }.shuffle
   end
 
   def dump_map
