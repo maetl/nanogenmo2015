@@ -8,7 +8,7 @@ MONSTER_NAME = ['Crimax', 'Croesus', 'Goroth', 'Hezak', 'Ir', 'Kael', 'Kalantir'
 MONSTER_GENDER = [:m, :f, :t].sample
 PRONOUN = { m: 'he', f: 'she', i: 'it' }
 POSSESIVE_PRONOUN = { m: 'his', m: 'her', i: 'their' }
-VILLAGE_NAME = ['Notty', 'Nuria', 'Orm', 'Pildor', 'Qadir', 'Redthorn', 'Rythern', 'Sunshadow', 'Willen', 'Zathe'].sample
+VILLAGE_NAME = ['Notty', 'Nuria', 'Orm', 'Qadir', 'Redthorn', 'Rythern', 'Sunshadow', 'Willen', 'Zathe'].sample
 
 class Introduction < Calyx::Grammar
   start :introduction
