@@ -12,28 +12,52 @@ class Dungeon < Calyx::Grammar
   )
 
   rule :empty, '{room_description} {empty_atmosphere}'
-  rule :monster_only, '{room_description} There is a monster here. {monster_encounter}'
-  rule :monster_treasure, '{room_description} There is a monster and treasure here. {monster_encounter}'
+  rule :monster_only, '{room_description} {monster_only_encounter}'
+  rule :monster_treasure, '{room_description} {monster_treasure_encounter}'
   rule :special, '{room_description} {special_situation}'
   rule :trick_trap, '{room_description} There is something not quite right about this place.'
   rule :treasure, '{room_description} There is treasure here.'
 
-  rule :monster_encounter, [:monster_deadly, 0.05], [:monster_hostile, 0.45], [:monster_neutral, 0.5]
+  #rule :monster_encounter, [:monster_deadly, 0.05], [:monster_hostile, 0.45], [:monster_neutral, 0.5]
 
+  rule :trick_trap_encounter, [:trap_deadly, 0.05], [:trap_mechanical, 0.6], [:trap_magical, 0.35]
+
+  rule :trap_deadly, 'The deadly trap kills you instantly.'
+
+  rule :trap_mechanical, '{trap_trigger}'
+
+  rule :trap_trigger, 'pressure plate', 'tripwire', 'pit'
+
+  rule :monster_treasure_encounter, 'There is a monster and treasure here.'
+
+  rule :monster_only_encounter, :monster_deadly
   rule :monster_deadly, :monster_basilisk
   rule :monster_hostile, ''
   rule :monster_neutral, ''
 
   rule :monster_bulky, '{bulky_movement.capitalize} {room_movement} is'
   rule :room_movement, 'towards you', 'ahead of you'
-  rule :bulky_movement, 'moving', 'lumbering', 'moving sluggishly', 'stamping', 'stoming', 'trampling'
+  rule :bulky_movement, 'moving', 'lumbering', 'moving sluggishly', 'stamping', 'stomping', 'trampling'
 
-  rule :monster_basilisk, '{monster_bulky} a giant basilisk. As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death}'
+  rule :br, "\n\n"
+  rule :success, 'SUCCESS:'
+  rule :failure, 'FAILURE:'
 
-  rule :petrifying_gaze_strike, 'its petrifying gaze meets you head on', 'you stare straight into its petrifying gaze'
-  rule :petrifying_gaze_death, '{last_memory_flash} is the {horrific} expression in its eyes, as your body rapidly fuses into solid stone. THE END.'
+  rule :monster_basilisk, '{monster_bulky} a giant basilisk. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death}{br}{success}{br}'
 
-  rule :last_memory_flash, 'The last thing you remember', 'Your last experience', 'Your final memory', ''
+  rule :petrifying_gaze_strike, 'its petrifying gaze {strikes} you head on', 'you {stare_directly} into its petrifying gaze'
+  rule :petrifying_gaze_death, '{last_memory_flash} is the {horrific} projection from its eyes as your {petrifying_gaze_body} into {petrifying_gaze_stone}.'
+  rule :petrifying_gaze_body, 'body rapidly {fuses}', 'body {fuses}'
+  rule :petrifying_gaze_stone, 'cold stone', 'solid stone'
+
+  rule :strikes, 'strikes', 'meets', 'hits'
+  rule :stare_directly, 'stare straight', 'stare directly'
+  rule :fuses, 'freezes', 'fuses', 'hardens'
+
+  rule :last_memory_flash, 'The {last_memory_final} thing you {last_memory_experience}', 'Your {last_memory_final} {last_memory_moment}'
+  rule :last_memory_experience, 'remember', 'see', 'experience', 'are consciously aware of'
+  rule :last_memory_moment, 'experience', 'moment of awareness', 'moment of experience'
+  rule :last_memory_final, 'final', 'last', 'very last'
 
   rule :reptilian_adj, 'scaly', 'dull coloured', 'scabrous', 'encrusted'
   rule :reptilian_noun, 'monster', 'reptile', 'lizard'
@@ -111,4 +135,21 @@ class Dungeon < Calyx::Grammar
   rule :prep_from, 'from', 'out of'
 
   rule :stone_interior, '{verb_hewn} {prep_from} {adj_surface} {noun_stone}'
+
+  rule :save_against_trap, 'To {dodge} the trap, you must {movement} {safety}. {skill_test}'
+  rule :save_against_attack, 'To {dodge} the attack, you must {movement} {safety}. {skill_test}'
+  rule :dodge, 'dodge', 'avoid'
+  rule :movement, 'dive', 'roll', 'jump'
+  rule :safety, 'to safety', 'clear in time'
+
+  rule :test_of, 'Test your', 'Roll against', 'This is a test of'
+  rule :skill_test, '{test_of} SKILL. {save_procedure}'
+  rule :strength_test, '{test_of} STRENGTH. {save_procedure}'
+  rule :stamina_test, '{test_of} STAMINA {save_procedure}'
+
+  rule :save_procedure, '{success_procedure} {failure_procedure}'
+  rule :success_procedure, 'If you succeed, you can {continue_to_the_exit}', 'If successful, then {continue_to_the_exit}', 'If your roll succeeds, {continue_to_the_exit}'
+  rule :continue_to_the_exit, 'choose one of the exits.', 'choose an exit path.', 'go to one of the exits.'
+  rule :failure_procedure, 'If you fail, {continue_reading}.', 'Otherwise, {continue_reading}.'
+  rule :continue_reading, 'continue reading', 'continue below', 'continue', 'keep reading'
 end
