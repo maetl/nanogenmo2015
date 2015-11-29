@@ -33,7 +33,7 @@ class Dungeon < Calyx::Grammar
   rule :petrifying_gaze_strike, 'its petrifying gaze meets you head on', 'you stare straight into its petrifying gaze'
   rule :petrifying_gaze_death, '{last_memory_flash} is the {horrific} expression in its eyes, as your body rapidly fuses into solid stone. THE END.'
 
-  rule :last_memory_flash, 'The last thing you remember', 'Your dying memory', 'Your final memory', ''
+  rule :last_memory_flash, 'The last thing you remember', 'Your last experience', 'Your final memory', ''
 
   rule :reptilian_adj, 'scaly', 'dull coloured', 'scabrous', 'encrusted'
   rule :reptilian_noun, 'monster', 'reptile', 'lizard'
