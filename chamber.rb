@@ -63,9 +63,9 @@ class Chamber
     if neighbours_directions.empty?
       ['There is no way forward', 'You have come to a dead end.'].sample
     elsif neighbours_directions.size == 1
-      "There is a passage leading #{cardinal_text(neighbours_directions.first)}."
+      "There is a passage leading #{Directions.cardinal_text(neighbours_directions.first)}."
     else
-      "There are passages to the #{neighbours_directions.map { |d| cardinal_text(d) }.join(' and ')}."
+      "There are passages to the #{neighbours_directions.map { |d| Directions.cardinal_text(d) }.join(' and ')}."
     end
   end
 end

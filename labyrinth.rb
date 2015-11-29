@@ -1,7 +1,44 @@
-class RecursiveBacktracker
-  def self.on(grid, start_at)
+class Labyrinth
+  attr_reader :grid
+
+  def initialize(size=700)
+    @size = size
+    @spaces = {}
+  end
+
+  def get_placeholder_cells
+    @spaces
+  end
+
+  def generate
+    scatter_spaces
+    translate_to_origin
+    connect_grid
+    link_pathways
+    self
+  end
+
+  def connect_grid
+    @grid.each do |row|
+      row.each do |cell|
+        if cell
+          cell.north = grid_pointer(cell.position, 'N')
+          cell.south = grid_pointer(cell.position, 'S')
+          cell.west  = grid_pointer(cell.position, 'W')
+          cell.east  = grid_pointer(cell.position, 'E')
+        end
+      end
+    end
+  end
+
+  def grid_pointer(position, direction)
+    x, y = Directions.move(position, direction)
+    @grid[x][y] unless @grid[x].nil?
+  end
+
+  def link_pathways
     stack = []
-    stack.push start_at
+    stack.push(start_chamber)
 
     while stack.any?
       current = stack.last
@@ -14,71 +51,97 @@ class RecursiveBacktracker
         stack.push(neighbor)
       end
     end
-
-    grid
-  end
-end
-
-class Labyrinth
-  attr_reader :rows, :columns
-
-  def initialize(grid)
-    p grid
-    @rows = grid.count
-    @columns = grid.first.count
-    @grid = grid.
-
-    configure_cells
   end
 
-  def prepare_grid
-    Array.new(rows) do |row|
-      Array.new(columns) do |column|
-        Cell.new(row, column)
+  def translate_to_origin
+    width = max_x - min_x
+    height = max_y - min_y
+    origin = 0
+
+    @grid = Array.new(width) { Array.new(height, false) }
+
+    origin.upto(width-1) do |x|
+      origin.upto(height-1) do |y|
+        if @spaces.key?([x + min_x, y + min_y])
+          @grid[x][y] = Chamber.new(x, y)
+        else
+          # @grid[x][y] = false
+        end
       end
     end
   end
 
-  def size
-    @rows * @columns
+  def scatter_spaces
+    add_space([0,0])
   end
 
-  def random_chamber
-    row = rand(@rows)
-    column = rand(@grid[row].count)
-    self[row, column]
+  def start_chamber
+    x,y = @spaces.keys.min_by { |(x, y)| x }
+    @grid[x][y]
   end
 
-  def configure_cells
-    each_cell do |cell|
-      row = cell.row
-      col = cell.column
+  def max_x
+    @max_x ||= @spaces.keys.max_by { |(x, y)| x }.first
+  end
 
-      cell.north = self[row - 1, col]
-      cell.south = self[row + 1, col]
-      cell.west  = self[row, col - 1]
-      cell.east  = self[row, col + 1]
+  def max_y
+    @max_y ||= @spaces.keys.max_by { |(x, y)| y }.last
+  end
+
+  def min_x
+    @min_x ||= @spaces.keys.min_by { |(x, y)| x }.first
+  end
+
+  def min_y
+    @min_y ||= @spaces.keys.min_by { |(x, y)| y }.last
+  end
+
+  def move_next(position)
+    next_spaces = Directions::CARDINAL_POINTS.reject do |direction|
+      @spaces.key?(Directions.move(position, direction))
+    end
+
+    next_spaces.sample(rand(1..3))
+  end
+
+  def add_space(position)
+    return if @spaces.count >= @size
+
+    next_spaces = move_next(position)
+
+    @spaces[position] = Space.new(position, next_spaces)
+
+    next_spaces.each do |direction|
+      add_space(Directions.move(position, direction))
     end
   end
 
-  def [](row, column)
-    return nil unless row.between?(0, @rows - 1)
-    return nil unless column.between?(0, @grid[row].count - 1)
-    @grid[row][column]
-  end
-
-  def each_row
-    @grid.each_with_index do |row, i|
-      yield row, i
-    end
-  end
-
-  def each_cell
-    each_row do |row, x|
-      row.each_with_index do |space, y|
-        #p space
-        yield Chamber.new(x, y) if space
+  def dump_descriptions
+    section = 0
+    @grid.each_with_index do |row, x|
+      row.each_with_index do |cell, y|
+        if cell
+          section += 1
+          puts "§ #{section}"
+          puts cell.generate_text
+          puts cell.generate_exits
+          puts
+        end
       end
+    end
+  end
+
+  def dump_map
+    @grid.each do |row|
+      buffer = String.new
+      row.each do |cell|
+        if cell
+          buffer << '#'
+        else
+          buffer << ' '
+        end
+      end
+      puts buffer
     end
   end
 end

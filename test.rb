@@ -3,13 +3,16 @@ require './quest'
 require './introduction'
 require './encounter'
 
-entrance = Entrance.new
-puts entrance.generate
+# entrance = Entrance.new
+# puts entrance.generate
+#
+# puts Quest.generate
+#
+# intro = Introduction.new
+# puts intro.generate
+#
+# encounter = Encounter.new
+# puts encounter.generate
 
-puts Quest.generate
-
-intro = Introduction.new
-puts intro.generate
-
-encounter = Encounter.new
+encounter = MonsterEncounter.new
 puts encounter.generate
