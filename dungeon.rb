@@ -31,7 +31,7 @@ class Dungeon < Calyx::Grammar
   rule :monster_treasure_encounter, 'There is a monster and treasure here.'
 
   rule :monster_only_encounter, :monster_deadly
-  rule :monster_deadly, :monster_basilisk
+  rule :monster_deadly, :monster_basilisk, :monster_gorgon
   rule :monster_hostile, ''
   rule :monster_neutral, ''
 
@@ -43,12 +43,24 @@ class Dungeon < Calyx::Grammar
   rule :success, 'SUCCESS:'
   rule :failure, 'FAILURE:'
 
-  rule :monster_basilisk, '{monster_bulky} a giant basilisk. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death}{br}{success}{br}'
+  rule :monster_basilisk, '{monster_bulky} a {monstrous_adj} basilisk. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death}{br}{success}{br}'
+  rule :monster_gorgon, '{monster_bulky} a {gorgon_adj} gorgon. {clouds.capitalize} of {green} smoke {puff} from its {mouth}. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {metallic_adj} {beast_noun} snaps open its jaws and {petrifying_breath_strike}. {petrifying_breath_death}{br}{success}{br}'
 
+  rule :gorgon_adj, 'bull-like', :monstrous_adj
+  rule :monstrous_adj, 'monstrous', 'giant'
+
+  rule :green, 'green', 'viridescent'
+  rule :clouds, 'plumes', 'clouds', 'faint clouds', 'faint plumes' 'a faint mist'
+  rule :putrid, 'putrid', 'putrifying', 'acrid'
+  rule :puff, 'puff', 'billow'
+  rule :mouth, 'mouth', 'maw'
+
+  rule :petrifying_breath_strike, 'its {putrid} breath washes over you', 'you stumble directly'
   rule :petrifying_gaze_strike, 'its petrifying gaze {strikes} you head on', 'you {stare_directly} into its petrifying gaze'
-  rule :petrifying_gaze_death, '{last_memory_flash} is the {horrific} projection from its eyes as your {petrifying_gaze_body} into {petrifying_gaze_stone}.'
-  rule :petrifying_gaze_body, 'body rapidly {fuses}', 'body {fuses}'
-  rule :petrifying_gaze_stone, 'cold stone', 'solid stone'
+  rule :petrifying_gaze_death, '{last_memory_flash} is the {horrific} projection from its eyes as your {petrifying_body} into {petrifying_stone}.'
+  rule :petrifying_breath_death, '{last_memory_flash} is choking on the toxic gas as your {petrifying_body} into {petrifying_stone}.'
+  rule :petrifying_body, 'body rapidly {fuses}', 'body {fuses}'
+  rule :petrifying_stone, 'cold stone', 'solid stone'
 
   rule :strikes, 'strikes', 'meets', 'hits'
   rule :stare_directly, 'stare straight', 'stare directly'
@@ -59,8 +71,11 @@ class Dungeon < Calyx::Grammar
   rule :last_memory_moment, 'experience', 'moment of awareness', 'moment of experience'
   rule :last_memory_final, 'final', 'last', 'very last'
 
-  rule :reptilian_adj, 'scaly', 'dull coloured', 'scabrous', 'encrusted'
+  rule :reptilian_adj, 'scaly', 'dull coloured', 'scabrous'
   rule :reptilian_noun, 'monster', 'reptile', 'lizard'
+
+  rule :metallic_adj, 'encrusted', 'plate-covered', 'armoured'
+  rule :beast_noun, 'monster', 'beast'
 
   rule :freeze_reaction, '{pause} with {shock}'
   rule :head_movement, 'turns', 'raises', 'lifts'
@@ -149,7 +164,7 @@ class Dungeon < Calyx::Grammar
 
   rule :save_procedure, '{success_procedure} {failure_procedure}'
   rule :success_procedure, 'If you succeed, you can {continue_to_the_exit}', 'If successful, then {continue_to_the_exit}', 'If your roll succeeds, {continue_to_the_exit}'
-  rule :continue_to_the_exit, 'choose one of the exits.', 'choose an exit path.', 'go to one of the exits.'
+  rule :continue_to_the_exit, 'choose one of the exits.', 'choose an exit path.', 'go to one of the exits.', 'exit safely.'
   rule :failure_procedure, 'If you fail, {continue_reading}.', 'Otherwise, {continue_reading}.'
   rule :continue_reading, 'continue reading', 'continue below', 'continue', 'keep reading'
 end
