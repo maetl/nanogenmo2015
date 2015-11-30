@@ -15,7 +15,7 @@ module Plot
     elsif style == :monster_of
       "The #{MONSTER_TYPE.to_s.capitalize} of #{VILLAGE_NAME}"
     else
-      shadow = ['Shadow', 'Darkness', 'Caverns']
+      shadow = ['Shadow', 'Darkness', 'Caverns'].sample
       "The #{shadow} under #{VILLAGE_NAME}"
     end
   end
