@@ -7,8 +7,11 @@ require './chamber'
 require './labyrinth'
 
 puts "# #{Plot.generate_title}"
+puts
 puts "A generated gamebook."
+puts
 puts "By Mark Rickerby for NaNoGenMo2015."
+puts
 
 intro = Introduction.new
 
