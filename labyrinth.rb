@@ -11,8 +11,9 @@ class Labyrinth
     scatter_spaces
     translate_to_origin
     connect_grid
+    flatten_grid
     link_pathways
-    flatten_and_shuffle
+    link_plot_sections
     number_sections
     self
   end
@@ -36,6 +37,9 @@ class Labyrinth
   end
 
   def link_pathways
+    start_chamber = dead_ends.first
+    start_chamber.mark_entrance!
+
     stack = []
     stack.push(start_chamber)
 
@@ -49,6 +53,12 @@ class Labyrinth
         current.link(neighbor)
         stack.push(neighbor)
       end
+    end
+  end
+
+  def link_plot_sections
+    if dead_ends.size > 1
+      dead_ends.last.mark_quest_ending!
     end
   end
 
@@ -70,8 +80,8 @@ class Labyrinth
     end
   end
 
-  def flatten_and_shuffle
-    @chambers = @grid.flatten.select { |chamber| chamber.is_a?(Chamber) }.shuffle
+  def flatten_grid
+    @chambers = @grid.flatten.select { |chamber| chamber.is_a?(Chamber) }
   end
 
   def number_sections
@@ -84,9 +94,10 @@ class Labyrinth
     add_space([0,0])
   end
 
-  def start_chamber
-    x,y = @spaces.keys.min_by { |(x, y)| x }
-    @grid[x][y]
+  def dead_ends
+    chambers.select do |chamber|
+      chamber.dead_end?
+    end
   end
 
   def max_x

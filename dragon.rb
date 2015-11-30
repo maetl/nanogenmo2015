@@ -13,6 +13,3 @@ class Dragon < Calyx::Grammar
   rule :dragon_sarasm_tone, 'sarcastically', 'sardonically'
   rule :dragon_futility_remark, '“How many more of you are there?”', '“Surely you don’t expect to survive this?”'
 end
-
-dragon = Dragon.new
-puts dragon.generate

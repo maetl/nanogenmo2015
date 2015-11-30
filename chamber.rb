@@ -1,7 +1,9 @@
-require './dungeon'
 require 'active_support/core_ext/array'
+require './dungeon'
+require './dragon'
 
 DungeonGenerator = Dungeon.new
+DragonGenerator = Dragon.new
 
 class Chamber
   attr_reader :row, :column
@@ -12,6 +14,7 @@ class Chamber
     @row = row
     @column = column
     @links = {}
+    @entrance = false
   end
 
   def link(cell, bidi=true)
@@ -43,7 +46,27 @@ class Chamber
   end
 
   def section_heading
-    "§ #{@section_number}"
+    "§#{@section_number}"
+  end
+
+  def dead_end?
+    neighbors.size == 1
+  end
+
+  def mark_entrance!
+    @entrance = true
+  end
+
+  def mark_quest_ending!
+    @quest_ending = true
+  end
+
+  def entrance?
+    @entrance
+  end
+
+  def ending?
+    @quest_ending
   end
 
   def neighbors_map
@@ -76,7 +99,13 @@ class Chamber
   end
 
   def section_body
-    DungeonGenerator.generate
+    if entrance?
+      'This is the entrance to the dungeon. As you walk into the gloomy cave, the door slams closed behind you.'
+    elsif ending?
+      DragonGenerator.generate
+    else
+      DungeonGenerator.generate
+    end
   end
 
   def generate_exits
@@ -89,7 +118,7 @@ class Chamber
 
   def exit_directions
     neighbors_map.inject([]) do |dirs, (key, chamber)|
-      dirs << "- To go #{Directions.cardinal_text(key).upcase} turn to #{chamber.section_heading}"
+      dirs << "- To go #{Directions.cardinal_text(key).upcase} turn to **#{chamber.section_heading}**"
     end.join("\n")
   end
 end

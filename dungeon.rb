@@ -43,7 +43,7 @@ class Dungeon < Calyx::Grammar
   rule :success, 'SUCCESS:'
   rule :failure, 'FAILURE:'
 
-  rule :monster_basilisk, '{monster_bulky} a {monstrous_adj} basilisk. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death}{br}{success}{br}'
+  rule :monster_basilisk, '{monster_bulky} a {monstrous_adj} basilisk. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {reptilian_adj} {reptilian_noun} {head_movement} its head and {petrifying_gaze_strike}. {petrifying_gaze_death} THE END.{br}{success}'
   rule :monster_gorgon, '{monster_bulky} a {gorgon_adj} gorgon. {clouds.capitalize} of {green} smoke {puff} from its {mouth}. {save_against_attack}{br}{failure}{br}As you {freeze_reaction}, the {metallic_adj} {beast_noun} snaps open its jaws and {petrifying_breath_strike}. {petrifying_breath_death}{br}{success}{br}'
 
   rule :gorgon_adj, 'bull-like', :monstrous_adj
