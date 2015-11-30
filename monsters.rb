@@ -16,12 +16,26 @@ module Monsters
       send(generate_monster)
     end
 
+    def generate_text
+      monster = generate
+      "#{monster[:name].upcase} (STRENGTH: #{monster[:strength]}, STAMINA: #{monster[:stamina]})"
+    end
+
     def generate_monster
       generate_type.sample
     end
 
     def generate_type
       INDEX.sample
+    end
+
+    def all_text
+      INDEX.reduce([]) do |index, type|
+        index << type.reduce([]) do |types, ref|
+          monster = send(ref)
+          types << "#{monster[:name].upcase} (STRENGTH: #{monster[:strength]}, STAMINA: #{monster[:stamina]})"
+        end
+      end.flatten
     end
 
     def dire_bat
@@ -48,7 +62,7 @@ module Monsters
       { strength: 12, stamina: 12, name: 'Giant Scorpion' }
     end
 
-    def giant_scorpion
+    def giant_spider
       { strength: 12, stamina: 12, name: 'Giant Spider' }
     end
 
@@ -57,45 +71,43 @@ module Monsters
     end
 
     def cave_troll
-      { skill: 10, strength: 12, stamina: 12, name: 'Giant Scorpion' }
+      { strength: 14, stamina: 20, name: 'Cave Troll' }
     end
 
     def ogre
-      { strength: 12, stamina: 12, name: 'Giant Spider' }
+      { strength: 12, stamina: 20, name: 'Ogre' }
     end
 
     def blood_worm
-      { skill: 10, strength: 12, stamina: 12, name: 'Blood Worm' }
+      { strength: 10, stamina: 12, name: 'Blood Worm' }
     end
 
     def death_worm
-      { strength: 12, stamina: 12, name: 'Death Worm' }
+      { strength: 10, stamina: 18, name: 'Death Worm' }
     end
 
     def slime
-      { strength: 12, stamina: 12, name: 'Slime' }
-
+      { strength: 6, stamina: 7, name: 'Slime' }
     end
 
     def carnivorous_blob
-      { strength: 12, stamina: 12, name: 'Carnivorous Blob' }
+      { strength: 10, stamina: 14, name: 'Carnivorous Blob' }
     end
 
     def shoggoth
-      { strength: 12, stamina: 12, name: 'Shoggoth' }
+      { strength: 12, stamina: 20, name: 'Shoggoth' }
     end
 
     def skeleton
-      { strength: 12, stamina: 12, name: 'Skeleton' }
+      { strength: 9, stamina: 9, name: 'Skeleton' }
     end
 
     def ghoul
-      { strength: 12, stamina: 12, name: 'Ghoul' }
+      { strength: 10, stamina: 12, name: 'Ghoul' }
     end
 
     def murder_crow
-      { strength: 12, stamina: 12, name: 'Murder Crow' }
+      { strength: 8, stamina: 8, name: 'Murder Crow' }
     end
-
   end
 end

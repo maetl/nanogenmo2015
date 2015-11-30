@@ -6,6 +6,10 @@ require './directions'
 require './chamber'
 require './labyrinth'
 
+puts "# #{Plot.generate_title}"
+puts "A generated gamebook."
+puts "By Mark Rickerby for NaNoGenMo2015."
+
 intro = Introduction.new
 
 puts "## Prologue"
@@ -13,7 +17,7 @@ puts
 puts intro.generate
 puts
 
-labyrinth = Labyrinth.new(200)
+labyrinth = Labyrinth.new(1000)
 labyrinth.generate
 
 labyrinth.chambers.each do |chamber|
