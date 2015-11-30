@@ -56,21 +56,11 @@ class Chamber
   end
 
   def neighbors
-    list = []
-    list << north if north
-    list << south if south
-    list << east if east
-    list << west if west
-    list
+    neighbors_map.values
   end
 
   def neighbours_directions
-    list = []
-    list << 'N' if north
-    list << 'S' if south
-    list << 'E' if east
-    list << 'W' if west
-    list
+    neighbors_map.keys
   end
 
   def neighbours_text_list
