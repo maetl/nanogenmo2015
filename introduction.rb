@@ -1,20 +1,22 @@
 require 'calyx'
-
-require './entrance'
-
-QUEST = :defeat_monster
-MONSTER_TYPE = :dragon
-MONSTER_NAME = ['Crimax', 'Croesus', 'Goroth', 'Hezak', 'Ir', 'Kael', 'Kalantir', 'Koydl', 'Mangarak', 'Maran', 'Mareberth', 'Merg', 'Mesech', 'Narok', 'Nefarus', 'Nothar', 'Ogardus', 'Omaniron', 'Ozorak', 'Polor', 'Porchos', 'Ranon', 'Rayth', 'Scius', 'Sesklos', 'Sethron', 'Sezer', 'Siguruk', 'Silveron', 'Skrymir', 'Slath', 'Sleeth', 'Sutha', 'Talberon', 'Tazoe', 'Tethra', 'Tiang', 'Tondril', 'Ugmar', 'Ungon', 'Vagor', 'Varag', 'Volux', 'Wrothag', 'Zymos'].sample
-MONSTER_GENDER = [:m, :f, :t].sample
-PRONOUN = { m: 'he', f: 'she', i: 'it' }
-POSSESIVE_PRONOUN = { m: 'his', m: 'her', i: 'their' }
-VILLAGE_NAME = ['Notty', 'Nuria', 'Orm', 'Qadir', 'Redthorn', 'Rythern', 'Sunshadow', 'Willen', 'Zathe'].sample
+require 'indefinite_article'
 
 class Introduction < Calyx::Grammar
   start :introduction
-  rule :introduction, "{first_line}.\n\n{quest}.\n\n{entrance_description}.\n\n{starting_choice}"
-  rule :entrance_description, 'The entrance to {monster_name}’s lair is {entrance} on the outskirts of {village_name}'
-  rule :starting_choice, "- **To enter the dungeon and defeat the #{MONSTER_TYPE} turn to §1.**"
+  rule :br, "\n\n"
+  rule :introduction, '{first_line}.{br}{quest}.{br}{entrance_description}. {rumours}.{br}{starting_choice}'
+  rule :entrance_description, 'The entrance to {monster_name}’s {dungeon} is {entrance} on the outskirts of {village_name}', 'Somewhere near {village_name} is the entrance to {monster_name}’s {dungeon}'
+  rule :dungeon, 'dungeon', 'lair'
+
+  rule :rumours, '{rumours_treasure}, {rumours_lost}'
+  rule :rumours_treasure, '{others.capitalize} may have found {riches} there', '{others.capitalize} have found {riches} in {treasure_underground} there'
+  rule :rumours_lost, 'though many {who_enter}are never seen again'
+  rule :who_enter, 'who enter ', ''
+  rule :others, 'some', 'others'
+  rule :riches, 'riches', 'fortunes'
+  rule :treasure_underground, 'treasure', 'treasure and gold'
+
+  rule :starting_choice, "- To search for the entrance and ENTER the dungeon, turn to **§1**."
   rule :entrance, Entrance.new.generate
   #rule :first_line, :local_legend_trope, :tavern_trope, :captive_trope
   rule :first_line, :local_legend_trope
@@ -30,7 +32,7 @@ class Introduction < Calyx::Grammar
   rule :stories_adj, 'whispered', 'subtle'
   rule :stories_noun, 'rumours', 'legends', 'tales', 'stories'
   rule :stories_subject, 'of a {stories_fear} {stories_energy}'
-  rule :stories_fear, 'creeping', 'lurking', 'spreading', 'chilling', 'teratoid'
+  rule :stories_fear, 'creeping', 'lurking', 'spreading', 'chilling'
   rule :stories_energy, 'horror', 'darkness', 'shadow', 'scourge'
   rule :stories_impact, '{seem_verb} {more_and_more} {disturbing} as you {travel_closer}'
   rule :more_and_more, 'more and more', 'increasingly'
@@ -39,10 +41,14 @@ class Introduction < Calyx::Grammar
   rule :travel_closer, 'get closer to the village of {village_name}'
   rule :village_name, VILLAGE_NAME
   rule :quest, QUEST
-  rule :defeat_monster, 'The {stories_noun} tell of {monster_name}, a {monster_type} {impacts_of_monster}. The {people} {ask_for_help} {help} {this_menace} {before_toll}'
+  rule :defeat_monster, 'The {stories_noun} tell of {monster_name}, {monster_type} {impacts_of_monster}. The {people} {ask_for_help} {help} {this_menace} {before_toll}'
   rule :monster_name, MONSTER_NAME
   rule :monster_type, MONSTER_TYPE
-  rule :dragon, '{dragon_impression_adj} {dragon_appearance_adj} dragon'
+  rule :wizard,  '{wizard_impression_adj.with_indefinite_article}{wizard_appearance_adj} wizard'
+  rule :wizard_noun, 'wizard', 'mage', 'warlock'
+  rule :wizard_impression_adj, 'corrupt', 'depraved', 'demented', 'psychotic', 'evil'
+  rule :wizard_appearance_adj, ' dark', ''
+  rule :dragon, '{dragon_impression_adj.with_indefinite_article} {dragon_appearance_adj} dragon'
   rule :dragon_impression_adj, 'monstrous', 'horrifying', 'hideous'
   rule :dragon_appearance_adj, 'green', 'grey', 'white', 'red', 'black', 'yellow'
   rule :impacts_of_monster, 'whose {impact_description} {impact_effects}'
