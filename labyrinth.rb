@@ -57,14 +57,14 @@ class Labyrinth
     height = max_y - min_y
     origin = 0
 
-    @grid = Array.new(width) { Array.new(height, false) }
+    @grid = Array.new(width+1) { Array.new(height+1, false) }
 
-    origin.upto(width-1) do |x|
-      origin.upto(height-1) do |y|
+    origin.upto(width) do |x|
+      origin.upto(height) do |y|
         if @spaces.key?([x + min_x, y + min_y])
           @grid[x][y] = Chamber.new(x, y)
         else
-          # @grid[x][y] = false
+          @grid[x][y] = false
         end
       end
     end
@@ -122,6 +122,21 @@ class Labyrinth
 
     next_spaces.each do |direction|
       add_space(Directions.move(position, direction))
+    end
+  end
+
+  def dump_random_walk
+    min_x.upto(max_x) do |x|
+      row = []
+      min_y.upto(max_y) do |y|
+        chamber = @spaces[[x,y]]
+        if chamber.nil?
+          row << ' '
+        else
+          row << '#'
+        end
+      end
+      puts row.join
     end
   end
 
